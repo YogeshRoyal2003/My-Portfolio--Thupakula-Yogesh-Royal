@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yogesh Royal — Backend Developer</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070b14;
+    --card: #111d30;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --text: #e8f4fd;
+    --muted: #5a7fa0;
+    --border: rgba(0,212,255,0.15);
+    --glow: 0 0 40px rgba(0,212,255,0.2);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; overflow-x: hidden; cursor: none; }
+
+.cursor { width: 12px; height: 12px; background: var(–accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); mix-blend-mode: screen; transition: width .2s, height .2s; }
+.cursor-ring { width: 36px; height: 36px; border: 1.5px solid var(–accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); opacity: .5; }
+
+#bg-canvas { position: fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+
+nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; justify-content:space-between; align-items:center; padding:1.2rem 4rem; backdrop-filter:blur(20px); background:rgba(7,11,20,.7); border-bottom:1px solid var(–border); }
+.nav-logo { font-family:‘Space Mono’,monospace; font-size:1rem; color:var(–accent); letter-spacing:.2em; text-decoration:none; }
+.nav-links { display:flex; gap:2.5rem; list-style:none; }
+.nav-links a { color:var(–muted); text-decoration:none; font-size:.8rem; letter-spacing:.15em; text-transform:uppercase; transition:color .3s; }
+.nav-links a:hover { color:var(–accent); }
+
+section { position:relative; z-index:1; }
+
+/* HERO */
+#hero { min-height:100vh; display:flex; align-items:center; padding:0 4rem; padding-top:80px; gap:4rem; overflow:hidden; }
+.hero-content { max-width:680px; flex:1; }
+.hero-badge { display:inline-flex; align-items:center; gap:.5rem; padding:.4rem 1rem; border:1px solid var(–accent3); border-radius:100px; font-family:‘Space Mono’,monospace; font-size:.7rem; color:var(–accent3); letter-spacing:.1em; margin-bottom:1.5rem; animation:fadeUp .8s ease both; }
+.dot { width:6px; height:6px; background:var(–accent3); border-radius:50%; animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.5)} }
+.hero-name { font-size:clamp(3rem,7vw,6.5rem); font-weight:800; line-height:.95; margin-bottom:.4rem; animation:fadeUp .8s .1s ease both; }
+.hero-name span { background:linear-gradient(135deg,var(–accent),var(–accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.hero-title { font-family:‘Space Mono’,monospace; font-size:1rem; color:var(–muted); margin-bottom:1.5rem; animation:fadeUp .8s .2s ease both; }
+.hero-desc { font-size:1rem; color:rgba(232,244,253,.7); line-height:1.75; margin-bottom:2.5rem; animation:fadeUp .8s .3s ease both; }
+.hero-cta { display:flex; gap:1rem; flex-wrap:wrap; animation:fadeUp .8s .4s ease both; }
+.btn-primary { padding:.9rem 2.2rem; background:linear-gradient(135deg,var(–accent),#0099cc); color:#000; font-family:‘Syne’,sans-serif; font-weight:700; font-size:.9rem; border:none; border-radius:6px; cursor:none; text-decoration:none; display:inline-flex; align-items:center; gap:.5rem; transition:transform .2s,box-shadow .2s; }
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 10px 40px rgba(0,212,255,.4); }
+.btn-outline { padding:.9rem 2.2rem; background:transparent; color:var(–text); font-family:‘Syne’,sans-serif; font-weight:600; font-size:.9rem; border:1px solid var(–border); border-radius:6px; cursor:none; text-decoration:none; display:inline-flex; align-items:center; gap:.5rem; transition:border-color .2s,color .2s,transform .2s; }
+.btn-outline:hover { border-color:var(–accent); color:var(–accent); transform:translateY(-2px); }
+
+.hero-card-3d { flex-shrink:0; width:320px; perspective:900px; animation:fadeLeft 1s .4s ease both; }
+.card-inner { background:var(–card); border:1px solid var(–border); border-radius:18px; padding:2rem; transform:rotateY(-14deg) rotateX(4deg); transform-style:preserve-3d; box-shadow:var(–glow),24px 32px 80px rgba(0,0,0,.6); transition:transform .25s ease; position:relative; overflow:hidden; }
+.card-inner::before { content:’’; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:conic-gradient(from 0deg,transparent,rgba(0,212,255,.04) 60deg,transparent 120deg); animation:spin 9s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.card-avatar { width:68px; height:68px; border-radius:50%; background:linear-gradient(135deg,var(–accent),var(–accent2)); display:flex; align-items:center; justify-content:center; font-size:1.7rem; font-weight:800; color:#fff; margin-bottom:1rem; position:relative; z-index:1; }
+.card-name { font-weight:700; font-size:1rem; position:relative; z-index:1; }
+.card-role { font-family:‘Space Mono’,monospace; font-size:.68rem; color:var(–accent); margin:.3rem 0 1.2rem; position:relative; z-index:1; }
+.card-stats { display:grid; grid-template-columns:1fr 1fr; gap:.7rem; position:relative; z-index:1; }
+.stat-box { background:rgba(0,212,255,.05); border:1px solid var(–border); border-radius:10px; padding:.6rem; text-align:center; }
+.stat-num { font-size:1.25rem; font-weight:800; color:var(–accent); }
+.stat-label { font-size:.6rem; color:var(–muted); font-family:‘Space Mono’,monospace; }
+.card-tags { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:1rem; position:relative; z-index:1; }
+.tag { padding:.2rem .65rem; background:rgba(124,58,237,.15); border:1px solid rgba(124,58,237,.3); border-radius:100px; font-size:.62rem; color:#c4b5fd; font-family:‘Space Mono’,monospace; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeLeft { from{opacity:0;transform:translateX(60px)} to{opacity:1;transform:translateX(0)} }
+
+/* ABOUT */
+#about { padding:8rem 4rem; display:grid; grid-template-columns:1fr 1fr; gap:6rem; align-items:start; max-width:1400px; margin:0 auto; }
+.section-label { font-family:‘Space Mono’,monospace; font-size:.68rem; color:var(–accent); letter-spacing:.3em; text-transform:uppercase; margin-bottom:1rem; display:flex; align-items:center; gap:1rem; }
+.section-label::after { content:’’; flex:1; height:1px; background:var(–border); }
+.section-title { font-size:clamp(2rem,3.5vw,3rem); font-weight:800; line-height:1.1; margin-bottom:1.5rem; }
+.about-text { color:rgba(232,244,253,.68); line-height:1.8; margin-bottom:1rem; font-size:.95rem; }
+.timeline { display:flex; flex-direction:column; position:relative; }
+.timeline::before { content:’’; position:absolute; left:15px; top:0; bottom:0; width:1px; background:linear-gradient(to bottom,var(–accent),var(–accent2),transparent); }
+.tl-item { padding-left:3rem; padding-bottom:2.5rem; position:relative; }
+.tl-dot { position:absolute; left:8px; top:5px; width:14px; height:14px; border-radius:50%; background:var(–accent); border:2px solid var(–bg); box-shadow:0 0 14px var(–accent); }
+.tl-company { font-weight:700; font-size:1rem; }
+.tl-role { font-family:‘Space Mono’,monospace; font-size:.7rem; color:var(–accent); margin:.25rem 0; }
+.tl-date { font-size:.7rem; color:var(–muted); margin-bottom:.6rem; font-family:‘Space Mono’,monospace; }
+.tl-desc { font-size:.83rem; color:rgba(232,244,253,.6); line-height:1.65; }
+
+/* SKILLS */
+#skills { padding:6rem 4rem; max-width:1400px; margin:0 auto; }
+.skills-header { text-align:center; margin-bottom:4rem; }
+.skills-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.5rem; }
+.skill-card { background:var(–card); border:1px solid var(–border); border-radius:14px; padding:2rem; transition:transform .3s,border-color .3s,box-shadow .3s; position:relative; overflow:hidden; }
+.skill-card::before { content:’’; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(–accent),var(–accent2)); transform:scaleX(0); transform-origin:left; transition:transform .3s; }
+.skill-card:hover { transform:translateY(-5px); border-color:rgba(0,212,255,.3); box-shadow:var(–glow); }
+.skill-card:hover::before { transform:scaleX(1); }
+.skill-icon { font-size:1.8rem; margin-bottom:.9rem; }
+.skill-category { font-weight:700; margin-bottom:1rem; }
+.skill-items { display:flex; flex-wrap:wrap; gap:.5rem; }
+.skill-pill { padding:.28rem .75rem; background:rgba(0,212,255,.07); border:1px solid rgba(0,212,255,.2); border-radius:100px; font-size:.68rem; font-family:‘Space Mono’,monospace; color:var(–accent); }
+
+/* PROJECTS */
+#projects { padding:6rem 4rem; max-width:1400px; margin:0 auto; }
+.projects-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:2rem; margin-top:3rem; }
+.project-card { background:var(–card); border:1px solid var(–border); border-radius:18px; padding:2.2rem; position:relative; overflow:hidden; transition:transform .3s,box-shadow .3s; }
+.project-card:hover { transform:translateY(-6px); box-shadow:var(–glow),0 30px 60px rgba(0,0,0,.4); }
+.project-glow { position:absolute; width:200px; height:200px; border-radius:50%; background:radial-gradient(circle,rgba(0,212,255,.07) 0%,transparent 70%); top:-60px; right:-60px; pointer-events:none; }
+.featured-badge { position:absolute; top:1.2rem; right:1.2rem; font-family:‘Space Mono’,monospace; font-size:.58rem; color:var(–accent3); border:1px solid var(–accent3); padding:.2rem .6rem; border-radius:100px; }
+.project-num { font-family:‘Space Mono’,monospace; font-size:.68rem; color:var(–muted); margin-bottom:.8rem; }
+.project-title { font-size:1.25rem; font-weight:700; margin-bottom:.8rem; }
+.project-desc { font-size:.83rem; color:rgba(232,244,253,.6); line-height:1.7; margin-bottom:1.4rem; }
+.project-stack { display:flex; flex-wrap:wrap; gap:.4rem; margin-bottom:1.4rem; }
+.stack-tag { padding:.25rem .65rem; background:rgba(124,58,237,.12); border:1px solid rgba(124,58,237,.25); border-radius:100px; font-size:.62rem; font-family:‘Space Mono’,monospace; color:#c4b5fd; }
+.project-links { display:flex; gap:.8rem; }
+.project-link { display:inline-flex; align-items:center; gap:.4rem; font-size:.75rem; font-family:‘Space Mono’,monospace; color:var(–accent); text-decoration:none; padding:.5rem 1rem; border:1px solid rgba(0,212,255,.25); border-radius:6px; transition:background .2s,border-color .2s; }
+.project-link:hover { background:rgba(0,212,255,.1); border-color:var(–accent); }
+
+/* CONTACT */
+#contact { padding:8rem 4rem; max-width:900px; margin:0 auto; text-align:center; }
+.contact-title { font-size:clamp(2rem,5vw,3.8rem); font-weight:800; line-height:1.1; margin-bottom:1rem; }
+.contact-sub { color:rgba(232,244,253,.6); margin-bottom:3rem; font-size:1rem; line-height:1.75; }
+.contact-card { background:var(–card); border:1px solid var(–border); border-radius:20px; padding:3rem; position:relative; overflow:hidden; box-shadow:var(–glow); }
+.contact-card::before { content:’’; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(–accent),var(–accent2),var(–accent3)); }
+.contact-form { display:flex; flex-direction:column; gap:1.2rem; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; }
+.form-group { display:flex; flex-direction:column; gap:.5rem; text-align:left; }
+.form-group label { font-size:.7rem; color:var(–muted); font-family:‘Space Mono’,monospace; letter-spacing:.12em; }
+.form-group input, .form-group textarea { background:rgba(255,255,255,.04); border:1px solid var(–border); border-radius:8px; padding:.85rem 1rem; color:var(–text); font-family:‘Syne’,sans-serif; font-size:.9rem; outline:none; transition:border-color .2s,box-shadow .2s; resize:vertical; }
+.form-group input:focus, .form-group textarea:focus { border-color:var(–accent); box-shadow:0 0 0 3px rgba(0,212,255,.08); }
+.form-group textarea { min-height:130px; }
+.form-submit { padding:1rem 2.5rem; background:linear-gradient(135deg,var(–accent),var(–accent2)); color:#fff; font-family:‘Syne’,sans-serif; font-weight:700; font-size:1rem; border:none; border-radius:8px; cursor:none; transition:transform .2s,box-shadow .2s,opacity .2s; display:flex; align-items:center; justify-content:center; gap:.5rem; width:100%; }
+.form-submit:hover { transform:translateY(-2px); box-shadow:0 10px 40px rgba(0,212,255,.3); }
+.form-submit:disabled { opacity:.6; }
+.success-msg { display:none; align-items:center; justify-content:center; gap:.8rem; padding:1rem; background:rgba(16,185,129,.1); border:1px solid var(–accent3); border-radius:8px; color:var(–accent3); font-weight:600; margin-top:1rem; font-size:.9rem; }
+.success-msg.show { display:flex; }
+.contact-alt { margin-top:2rem; display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; }
+.contact-link { display:flex; align-items:center; gap:.5rem; color:var(–muted); text-decoration:none; font-size:.78rem; font-family:‘Space Mono’,monospace; transition:color .2s,border-color .2s; padding:.65rem 1.1rem; border:1px solid var(–border); border-radius:8px; }
+.contact-link:hover { color:var(–accent); border-color:var(–accent); }
+.contact-link svg { width:15px; height:15px; flex-shrink:0; }
+
+footer { border-top:1px solid var(–border); padding:2rem 4rem; display:flex; justify-content:space-between; align-items:center; font-size:.75rem; font-family:‘Space Mono’,monospace; color:var(–muted); position:relative; z-index:1; flex-wrap:wrap; gap:1rem; }
+footer a { color:var(–accent); text-decoration:none; }
+
+.reveal { opacity:0; transform:translateY(28px); transition:opacity .7s ease,transform .7s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+@media(max-width:900px){
+nav { padding:1rem 1.5rem; }
+.nav-links { display:none; }
+#hero { flex-direction:column; padding:5rem 1.5rem 3rem; gap:2.5rem; }
+.hero-card-3d { width:100%; animation:fadeUp 1s .4s ease both; }
+.card-inner { transform:none !important; }
+#about { padding:4rem 1.5rem; grid-template-columns:1fr; gap:3rem; }
+#skills, #projects, #contact { padding:4rem 1.5rem; }
+.form-row { grid-template-columns:1fr; }
+footer { padding:1.5rem; }
+.projects-grid { grid-template-columns:1fr; }
+}
+</style>
+
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <a href="#hero" class="nav-logo">YR_</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+
+<section id="hero">
+  <div class="hero-content">
+    <div class="hero-badge"><span class="dot"></span> Available for Backend Roles · Bengaluru</div>
+    <h1 class="hero-name">Yogesh<br><span>Royal</span></h1>
+    <p class="hero-title">// Backend Developer · Java Spring Boot</p>
+    <p class="hero-desc">Enterprise backend engineer at Capgemini (Volkswagen Group). Shipping production-ready Spring Boot applications, REST APIs, and full-stack systems. Open to exciting backend opportunities.</p>
+    <div class="hero-cta">
+      <a href="#contact" class="btn-primary">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        Reach Out
+      </a>
+      <a href="#projects" class="btn-outline">
+        View Projects
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </a>
+    </div>
+  </div>
+  <div class="hero-card-3d" id="heroCard">
+    <div class="card-inner" id="cardInner">
+      <div class="card-avatar">YR</div>
+      <div class="card-name">Thupakula Yogesh Royal</div>
+      <div class="card-role">// Backend Developer</div>
+      <div class="card-stats">
+        <div class="stat-box"><div class="stat-num">10+</div><div class="stat-label">ABAP Modules</div></div>
+        <div class="stat-box"><div class="stat-num">30+</div><div class="stat-label">API Endpoints</div></div>
+        <div class="stat-box"><div class="stat-num">150+</div><div class="stat-label">Daily Txns</div></div>
+        <div class="stat-box"><div class="stat-num">8.78</div><div class="stat-label">CGPA</div></div>
+      </div>
+      <div class="card-tags">
+        <span class="tag">Spring Boot</span>
+        <span class="tag">Java</span>
+        <span class="tag">PostgreSQL</span>
+        <span class="tag">REST APIs</span>
+        <span class="tag">JWT</span>
+        <span class="tag">React</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+
+<section id="about">
+  <div class="reveal">
+    <div class="section-label">About Me</div>
+    <h2 class="section-title">Crafting robust <span style="color:var(--accent)">backend systems</span></h2>
+    <p class="about-text">Backend developer with enterprise experience at Capgemini (Volkswagen Group) and Nokia. Passionate about Java Spring Boot — shipping production projects, completing certifications, and learning alongside senior Java engineers.</p>
+    <p class="about-text">I thrive on clean architecture, scalable REST APIs, and end-to-end delivery from requirements to production. Currently based in Bengaluru and actively seeking Java Spring Boot backend roles.</p>
+    <br>
+    <a href="mailto:yogeshroyal003@gmail.com" class="btn-primary" style="display:inline-flex;width:fit-content;">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      Let's Connect
+    </a>
+  </div>
+  <div class="timeline reveal">
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div class="tl-company">Capgemini</div>
+      <div class="tl-role">Software Engineer · SAP ABAP Developer</div>
+      <div class="tl-date">Apr 2025 – Present · On-site, Bengaluru · Client: Volkswagen Group</div>
+      <div class="tl-desc">Developed 10+ ABAP backend modules handling 50K+ daily transactions. Optimised query performance by 15%. Delivered 5+ change requests end-to-end in Agile sprints.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--accent2);box-shadow:0 0 14px var(--accent2)"></div>
+      <div class="tl-company">Nokia</div>
+      <div class="tl-role">Technical Developer</div>
+      <div class="tl-date">Oct 2023 – Jul 2024 · On-site</div>
+      <div class="tl-desc">MantaRay SON platform for 4G/5G automation deployed across 5+ countries. Authored REST API docs for 30+ endpoints used by 3 engineering teams. Reduced onboarding time by ~20%.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot" style="background:var(--accent3);box-shadow:0 0 14px var(--accent3)"></div>
+      <div class="tl-company">New Horizon College of Engineering</div>
+      <div class="tl-role">B.E. Computer Science & Engineering</div>
+      <div class="tl-date">2020 – 2024 · CGPA: 8.78 / 10</div>
+      <div class="tl-desc">Graduated with distinction in Computer Science and Engineering.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+
+<section id="skills">
+  <div class="skills-header reveal">
+    <div class="section-label" style="justify-content:center">Technical Arsenal</div>
+    <h2 class="section-title">My <span style="color:var(--accent)">Tech Stack</span></h2>
+  </div>
+  <div class="skills-grid">
+    <div class="skill-card reveal">
+      <div class="skill-icon">☕</div>
+      <div class="skill-category">Backend</div>
+      <div class="skill-items">
+        <span class="skill-pill">Java Spring Boot</span>
+        <span class="skill-pill">Spring Data JPA</span>
+        <span class="skill-pill">Node.js</span>
+        <span class="skill-pill">Express.js</span>
+        <span class="skill-pill">REST APIs</span>
+        <span class="skill-pill">JWT Auth</span>
+        <span class="skill-pill">Hibernate ORM</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🗄️</div>
+      <div class="skill-category">Databases</div>
+      <div class="skill-items">
+        <span class="skill-pill">PostgreSQL</span>
+        <span class="skill-pill">MySQL</span>
+        <span class="skill-pill">MongoDB</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">💻</div>
+      <div class="skill-category">Languages</div>
+      <div class="skill-items">
+        <span class="skill-pill">Java</span>
+        <span class="skill-pill">JavaScript</span>
+        <span class="skill-pill">SAP ABAP</span>
+        <span class="skill-pill">SQL</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🎨</div>
+      <div class="skill-category">Frontend</div>
+      <div class="skill-items">
+        <span class="skill-pill">React</span>
+        <span class="skill-pill">Tailwind CSS</span>
+        <span class="skill-pill">HTML</span>
+        <span class="skill-pill">CSS</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🛠️</div>
+      <div class="skill-category">Tools & Methods</div>
+      <div class="skill-items">
+        <span class="skill-pill">Git</span>
+        <span class="skill-pill">Postman</span>
+        <span class="skill-pill">Maven</span>
+        <span class="skill-pill">IntelliJ IDEA</span>
+        <span class="skill-pill">VS Code</span>
+        <span class="skill-pill">Agile / Scrum</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">📜</div>
+      <div class="skill-category">Certifications</div>
+      <div class="skill-items">
+        <span class="skill-pill">Java Spring Boot 3 — Udemy</span>
+        <span class="skill-pill">JavaScript Complete — Udemy</span>
+        <span class="skill-pill">Node.js Bootcamp — Udemy</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+
+<section id="projects">
+  <div class="reveal">
+    <div class="section-label">Work</div>
+    <h2 class="section-title">Featured <span style="color:var(--accent)">Projects</span></h2>
+  </div>
+  <div class="projects-grid">
+    <div class="project-card reveal">
+      <div class="project-glow"></div>
+      <div class="featured-badge">LIVE ●</div>
+      <div class="project-num">01 /</div>
+      <div class="project-title">Smart Expense Tracker</div>
+      <div class="project-desc">Full-stack expense tracking app with a Spring Boot REST API backend and React + Tailwind frontend — live on Vercel with 150+ test transactions processed daily. JWT-based auth and PostgreSQL with Spring Data JPA, filtering across 5+ categories and custom date ranges.</div>
+      <div class="project-stack">
+        <span class="stack-tag">Java Spring Boot</span><span class="stack-tag">React</span><span class="stack-tag">PostgreSQL</span><span class="stack-tag">JWT</span><span class="stack-tag">Tailwind CSS</span><span class="stack-tag">Spring Data JPA</span>
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/yogesh-royal" target="_blank" class="project-link">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+        <a href="#" class="project-link">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+          Live Demo
+        </a>
+      </div>
+    </div>
+    <div class="project-card reveal">
+      <div class="project-glow" style="background:radial-gradient(circle,rgba(124,58,237,.08) 0%,transparent 70%)"></div>
+      <div class="project-num">02 /</div>
+      <div class="project-title">Vehicle Inventory System</div>
+      <div class="project-desc">Backend app managing 500+ vehicle records via Spring Boot + Hibernate ORM. 6 REST endpoints for full CRUD with clean controller-service-repository layered architecture and MySQL persistence.</div>
+      <div class="project-stack">
+        <span class="stack-tag">Java</span><span class="stack-tag">Spring Boot</span><span class="stack-tag">Hibernate ORM</span><span class="stack-tag">MySQL</span><span class="stack-tag">REST API</span>
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/yogesh-royal" target="_blank" class="project-link">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+    <div class="project-card reveal">
+      <div class="project-glow" style="background:radial-gradient(circle,rgba(16,185,129,.08) 0%,transparent 70%)"></div>
+      <div class="featured-badge" style="border-color:var(--accent2);color:var(--accent2)">LIVE ●</div>
+      <div class="project-num">03 /</div>
+      <div class="project-title">Smart Task Manager</div>
+      <div class="project-desc">Task management REST API built with Node.js/Express + MongoDB, deployed live on Render. Supports 5 CRUD endpoints with middleware-based error handling across persistent MongoDB collections.</div>
+      <div class="project-stack">
+        <span class="stack-tag">Node.js</span><span class="stack-tag">Express.js</span><span class="stack-tag">MongoDB</span><span class="stack-tag">REST APIs</span><span class="stack-tag">Render</span>
+      </div>
+      <div class="project-links">
+        <a href="https://github.com/yogesh-royal" target="_blank" class="project-link">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+        <a href="#" class="project-link">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+          Live on Render
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+
+<section id="contact">
+  <div class="section-label reveal" style="justify-content:center">Reach Out</div>
+  <h2 class="contact-title reveal">Let's <span style="color:var(--accent)">Build</span><br>Something Great</h2>
+  <p class="contact-sub reveal">Have a backend role, a project idea, or just want to talk tech? Fill the form below and I'll get back to you promptly.</p>
+  <div class="contact-card reveal">
+    <form class="contact-form" id="contactForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fname">YOUR NAME</label>
+          <input type="text" id="fname" placeholder="Jane Smith" required>
+        </div>
+        <div class="form-group">
+          <label for="femail">YOUR EMAIL</label>
+          <input type="email" id="femail" placeholder="jane@company.com" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="fsubject">SUBJECT</label>
+        <input type="text" id="fsubject" placeholder="Backend Developer Opportunity at..." required>
+      </div>
+      <div class="form-group">
+        <label for="fmsg">MESSAGE</label>
+        <textarea id="fmsg" placeholder="Hi Yogesh, I came across your portfolio and I'd love to discuss..." required></textarea>
+      </div>
+      <button type="submit" class="form-submit" id="submitBtn">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        Send Message to Yogesh
+      </button>
+      <div class="success-msg" id="successMsg">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Mail client opening — your message is ready to send!
+      </div>
+    </form>
+  </div>
+  <div class="contact-alt reveal">
+    <a href="mailto:yogeshroyal003@gmail.com" class="contact-link">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      yogeshroyal003@gmail.com
+    </a>
+    <a href="https://www.linkedin.com/in/yogesh-royal-thupakula" target="_blank" class="contact-link">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+      LinkedIn
+    </a>
+    <a href="https://github.com/yogesh-royal" target="_blank" class="contact-link">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      GitHub
+    </a>
+    <a href="tel:+917893676529" class="contact-link">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.1 1.18a2 2 0 012-2.18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 6.83a16 16 0 006.29 6.29l1.12-1.34a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7a2 2 0 011.72 2.09z"/></svg>
+      +91 7893 676 529
+    </a>
+  </div>
+</section>
+
+<footer>
+  <span>© 2025 Yogesh Royal · Bengaluru, India</span>
+  <span>Backend Developer · <a href="mailto:yogeshroyal003@gmail.com">yogeshroyal003@gmail.com</a></span>
+</footer>
+
+<script>
+// Cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
+(function animRing(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);})();
+
+// Canvas
+const canvas=document.getElementById('bg-canvas');
+const ctx=canvas.getContext('2d');
+let W,H,nodes=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+window.addEventListener('resize',resize);resize();
+class Node{constructor(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.35;this.vy=(Math.random()-.5)*.35;this.r=Math.random()*2+.5;this.a=Math.random()*.5+.1;}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W)this.vx*=-1;if(this.y<0||this.y>H)this.vy*=-1;}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(0,212,255,${this.a})`;ctx.fill();}}
+for(let i=0;i<90;i++)nodes.push(new Node());
+let mX=-999,mY=-999;
+document.addEventListener('mousemove',e=>{mX=e.clientX;mY=e.clientY;});
+(function animate(){ctx.clearRect(0,0,W,H);const g=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,W*.7);g.addColorStop(0,'rgba(13,21,36,.96)');g.addColorStop(1,'rgba(7,11,20,.99)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+nodes.forEach(n=>{const dx=n.x-mX,dy=n.y-mY,d=Math.sqrt(dx*dx+dy*dy);if(d<160){n.vx+=dx/d*.015;n.vy+=dy/d*.015;}const sp=Math.sqrt(n.vx*n.vx+n.vy*n.vy);if(sp>1.5){n.vx*=.95;n.vy*=.95;}n.update();n.draw();});
+for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){const dx=nodes[i].x-nodes[j].x,dy=nodes[i].y-nodes[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<130){ctx.beginPath();ctx.moveTo(nodes[i].x,nodes[i].y);ctx.lineTo(nodes[j].x,nodes[j].y);ctx.strokeStyle=`rgba(0,212,255,${(1-d/130)*.12})`;ctx.lineWidth=.5;ctx.stroke();}}
+requestAnimationFrame(animate);})();
+
+// 3D card tilt
+const cardWrap=document.getElementById('heroCard');
+const cardEl=document.getElementById('cardInner');
+if(cardWrap&&window.innerWidth>900){
+  cardWrap.addEventListener('mousemove',e=>{const r=cardWrap.getBoundingClientRect();const x=e.clientX-r.left-r.width/2;const y=e.clientY-r.top-r.height/2;cardEl.style.transform=`rotateY(${x/18}deg) rotateX(${-y/18}deg) translateZ(20px)`;});
+  cardWrap.addEventListener('mouseleave',()=>{cardEl.style.transform='rotateY(-14deg) rotateX(4deg) translateZ(0)';});
+}
+
+// Scroll reveal
+const obs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*80);obs.unobserve(e.target);}});},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// Contact form
+document.getElementById('contactForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  const name=document.getElementById('fname').value;
+  const email=document.getElementById('femail').value;
+  const subject=document.getElementById('fsubject').value;
+  const msg=document.getElementById('fmsg').value;
+  const body=`Hi Yogesh,\n\nMy name is ${name} and you can reach me at ${email}.\n\n${msg}\n\nBest regards,\n${name}`;
+  window.location.href=`mailto:yogeshroyal003@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.textContent='✓ Opening mail client...';
+  document.getElementById('successMsg').classList.add('show');
+  setTimeout(()=>{btn.disabled=false;btn.innerHTML='<svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg> Send Message to Yogesh';this.reset();document.getElementById('successMsg').classList.remove('show');},5000);
+});
+</script>
+
+</body>
+</html>
